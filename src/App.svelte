@@ -23,14 +23,14 @@
 	$:text_sc = ChineseConversionAPI.tc2sc($lastText)
 	$:isSCText = (text_sc===$lastText && text_tc!==text_sc)
 	$:isTCText = (text_tc===$lastText && text_tc!==text_sc)
-	let cursor_activity = false
-	onMount(()=>{
+	//let cursor_activity = false
+	/*onMount(()=>{
 		console.log("Editor: ", editor)
-	})
+	})*/
 	
 	function cursorMoved(event) {
-		cursor_activity = true
-		console.log('cursor activity')
+		//cursor_activity = true
+		//console.log('cursor activity')
 		// console.log(event.detail)
 		
 	}
@@ -38,9 +38,9 @@
 	 
 	
 	function changed(event) {
-		console.log('changed')
+		//console.log('changed')
 		lastText.set(editor.getValue())
-		console.log($lastText)
+		//console.log($lastText)
 		// console.log(event.detail)
 
 		if(myDictWorker!==null)
@@ -169,9 +169,9 @@
 </div>
 
 <div class="container-footer">
-<p>
+<!--<p>
 	Cursor Activity: {cursor_activity}
-</p>
+</p>-->
 <div>
 	<button on:click={() => [editor.execCommand('selectAll'), editor.focus()]}>
 		Select All
