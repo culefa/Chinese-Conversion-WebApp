@@ -48,64 +48,113 @@
  
 
 	}
-	
+		
+	function jumpToLine(i, offset) {
+		var t = editor.charCoords({ line: i, ch: 0 }, "local").top;
+		// var middleHeight = editor.getScrollerElement().offsetHeight / 2; 
+		// editor.scrollTo(null, t - middleHeight - 5); 
 
-	function changeTextTo(new_text){
-		if(typeof new_text=='function') new_text = new_text();
-		if(typeof new_text!=='string') return;
-		let lastCurSel=editor.listSelections()
-		 editor.setValue(new_text);
-		  editor.focus()
-			editor.setSelections(lastCurSel)
+		// editor.scrollTo(null, t);
+
+
+		editor.display.scroller.scrollTop = t + offset;
+
+	}
+
+	function changeTextTo(new_text) {
+		if (typeof new_text == 'function') new_text = new_text();
+		if (typeof new_text !== 'string') return;
+		let lastCurSel = editor.listSelections();
+
+		let rect = editor.display.scroller.getBoundingClientRect();
+		let left = editor.display.scroller.scrollLeft;
+		let cc = editor.coordsChar({ left: rect.left, top: rect.top }, "page");
+		let i = cc.line;
+		let offset = 0;
+		if(i>=0){
+		 offset = editor.display.scroller.scrollTop - editor.charCoords({ line: i, ch: 0 }, 'local').top;
+	}
+
+		editor.setValue(new_text);
+		editor.focus()
+		editor.setSelections(lastCurSel)
+		if (i >= 0) {
+
+			// jumpToLine(i, offset);
+
+			Promise.resolve(0).then(()=>{
+
+				jumpToLine(i, offset);
+			});
+
+
+			requestAnimationFrame(() => {
+
+				jumpToLine(i, offset);
+
+				requestAnimationFrame(()=>{
+
+
+		 
+
+		editor.display.scroller.scrollLeft = left;
+
+
+				})
+
+
+
+			});
+		}
 	}
 
 
-	function handleKeydown(event:KeyboardEvent){
+	function handleKeydown(event: KeyboardEvent) {
 
-		if(event.key == 'ArrowDown' && (event.ctrlKey || event.metaKey)){
+		if (event.key == 'ArrowDown' && (event.ctrlKey || event.metaKey)) {
 			event.preventDefault();
 			event.stopImmediatePropagation();
 			event.stopPropagation();
 			changeTextTo(text_tc)
-			
-		}else if(event.key == 'ArrowUp' && (event.ctrlKey || event.metaKey)){
+
+		} else if (event.key == 'ArrowUp' && (event.ctrlKey || event.metaKey)) {
 			event.preventDefault();
 			event.stopImmediatePropagation();
 			event.stopPropagation();
 			changeTextTo(text_sc)
-		}else if(event.key == 'ArrowLeft' && (event.ctrlKey || event.metaKey) && editor.getSelection()===""){
+		} else if (event.key == 'ArrowLeft' && (event.ctrlKey || event.metaKey) && editor.getSelection() === "") {
 			event.preventDefault();
 			event.stopImmediatePropagation();
-			event.stopPropagation(); 
+			event.stopPropagation();
 			let cursor = editor.getCursor();
-			let curLine = editor.getLine(cursor.line) 
+			let curLine = editor.getLine(cursor.line)
 			let offset = 1;
-			for(const d of gDict){
-				let s = curLine.substring(cursor.ch-d.length,cursor.ch);
-				if(s===d){
-					offset=d.length;
+			for (const d of gDict) {
+				let s = curLine.substring(cursor.ch - d.length, cursor.ch);
+				if (s === d) {
+					offset = d.length;
 					break;
-				} 
+				}
 			}
-			for(let i = 0; i<offset; i++){
+			for (let i = 0; i < offset; i++) {
 				editor.execCommand('goCharLeft')
 			}
-			
-		}else if(event.key == 'ArrowRight' && (event.ctrlKey || event.metaKey) && editor.getSelection()===""){
+
+		} else if (event.key == 'ArrowRight' && (event.ctrlKey || event.metaKey) && editor.getSelection() === "") {
 			event.preventDefault();
 			event.stopImmediatePropagation();
-			event.stopPropagation(); 
+			event.stopPropagation();
 			let cursor = editor.getCursor();
-			let curLine = editor.getLine(cursor.line) 
+			let curLine = editor.getLine(cursor.line)
 			let offset = 1;
-			for(const d of gDict){
-				let s = curLine.substring(cursor.ch,cursor.ch+d.length);
-				if(s===d){
-					offset=d.length;
+			for (const d of gDict) {
+				let s = curLine.substring(cursor.ch, cursor.ch + d.length);
+				if (s === d) {
+					offset = d.length;
 					break;
-				} 
+				}
 			}
-			for(let i = 0; i<offset; i++){
+			for (let i = 0; i < offset; i++) {
 				editor.execCommand('goCharRight')
 			}
 		}
